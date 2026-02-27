@@ -96,12 +96,11 @@ function formatCommitPost(commit: GitHubCommit, repoFullName: string): string {
   const shortHash = commit.id.slice(0, 7);
   const committer = commit.committer.name || commit.author.name;
 
-  const markdown = `__${title}__
+  const markdown = `[\`${shortHash}\`](${commit.url}) __${title}__
 
 ${description ? 'Description: \n' + description + '\n\n' : ''}
 
 **[${repoFullName}]**
-[\`${shortHash}\`](${commit.url})
 
 Committed by ${committer}`;
 
