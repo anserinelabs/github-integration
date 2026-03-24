@@ -90,7 +90,7 @@ async function postToSlashwork(markdown: string): Promise<void> {
   );
 }
 
-function formatCommitPost(commit: GitHubCommit, repoFullName: string): string {
+function formatCommitPost(commit: GitHubCommit, repoFullName: string, branch: string): string {
   const [title, ...rest] = commit.message.split('\n');
   const description = rest.join('\n').trim();
   const shortHash = commit.id.slice(0, 7);
@@ -100,7 +100,7 @@ function formatCommitPost(commit: GitHubCommit, repoFullName: string): string {
 
 ${description ? 'Description: \n' + description + '\n\n' : ''}
 
-**[${repoFullName}]**
+**[${repoFullName}]** \`[${branch}]\`
 
 Committed by ${committer}`;
 
@@ -167,8 +167,10 @@ app.post('/webhook/github', verifySignatureMiddleware, (req, res) => {
     return;
   }
 
+  const branch = payload.ref.replace('refs/heads/', '');
+
   for (const commit of commits) {
-    const markdown = formatCommitPost(commit, repository.full_name);
+    const markdown = formatCommitPost(commit, repository.full_name, branch);
     postToSlashwork(markdown).catch((err: unknown) => {
       console.error('Failed to post commit to Slashwork:', err);
     });
